@@ -1,0 +1,7 @@
+tu          0.1
+voudrais    0.3
+un          0.05
+boisson     0.69
+ou          0.08
+bois        0.6
+encore      0.4

@@ -1,0 +1,4 @@
+je  0.1
+suis    0.15
+egyptien    0.73
+aussi   0.3

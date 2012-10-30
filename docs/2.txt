@@ -1,0 +1,5 @@
+je          0.1
+veux        0.3
+un          0.06
+boisson     0.78
+egyptien    0.7
