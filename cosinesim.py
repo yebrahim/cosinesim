@@ -15,13 +15,15 @@ Items are documents which should be given to the script, contained in a director
 import sys, re, math, csv
 from optparse import OptionParser
 
-# globals
+#------------- globals ---------------
 user_documents  = {}
 user_features   = {}
 doc_pattern     = '.txt'
 user_vectors    = ''
 doc_directory   = './'
 out_file        = 'cosinesim.out'
+similarity_type = 'cosine'
+sim_threshold   = 0.0
 
 def scalar(arr):
     total = 0
@@ -29,10 +31,13 @@ def scalar(arr):
         total += relev * relev
     return math.sqrt(total)
 
-# this function takes two feature vectors, which are dictionaries,
+# this function takes two users, retrieves their corresponding
+# feature vectors, which are dictionaries of (term, relevancy) pairs
 # mapping a term to its relevance, and representing two users,
 # and computes the cosine similarity between them
-def cosine_similarity(A,B):
+def compute_similarity(u1, u2):
+    A = user_features[u1]
+    B = user_features[u2]
     total = 0
     for term in A:
         if term in B:
@@ -72,6 +77,10 @@ parser.add_option('-v', '--user2', dest='user2',
         help='**can only be used with -u\nuser v to compute similarity against u')
 parser.add_option('-o', '--output', dest='output',
         help='output file name. default is consinesim.out')
+parser.add_option('-t', '--similarity_threshold', dest='sim_threshold',
+        help='output only similarities no less than t')
+parser.add_option('-m', '--similarity_measure', dest='similarity',
+        help='similarity measure. Only cosine or jaccard, default is cosine')
 parser.add_option('-s', '--suffix', dest='suffix',
         help='document suffixes. this is sometimes desirable to change. default is .txt')
 
@@ -89,8 +98,17 @@ user1 = options.user1
 user2 = options.user2
 if options.output:
     out_file = options.output
+if options.sim_threshold:
+    sim_threshold = int(options.sim_threshold)
 if options.suffix:
     doc_pattern = options.suffix
+if options.similarity:
+    if options.similarity.lower() == 'cosine':
+        similarity_type = 'cosine'
+    elif options.similarity.lower() == 'jaccard':
+        similarity_type = 'jaccard'
+    else:
+        parser.print_help()
 
 # load user vectors
 f = open(user_vectors, 'r')
@@ -111,30 +129,25 @@ ranked_result = []
 
 # compute similarity between user1 and all other users
 if user1 and not user2:
-    U = user_features[user1]
     for v in user_features:
         if v != user1:
-            V = user_features[v]
-            ranked_result.append((cosine_similarity(U,V), str(user1) + ', ' + str(v)))
+            ranked_result.append((compute_similarity(user1, v), str(user1) + ', ' + str(v)))
 elif user1 and user2:
-    U = user_features[user1]
-    V = user_features[user2]
-    ranked_result.append((cosine_similarity(U,V), str(user1) + ', ' + str(user2)))
+    ranked_result.append((compute_similarity(user1, user2), str(user1) + ', ' + str(user2)))
 elif not user1 and not user2:
     print('computing similarity between all users..')
     for u in user_features:
         for v in user_features:
             # don't repeat computation
             if int(u) < int(v):
-                U = user_features[u]
-                V = user_features[v]
-                ranked_result.append((cosine_similarity(U,V), str(u) + ', ' + str(v)))
+                ranked_result.append((compute_similarity(u, v), str(u) + ', ' + str(v)))
 else:
     parser.print_help()
 
 ranked_result = sorted(ranked_result, reverse=True)
 for res,key in ranked_result:
-    f.write(key + ': ' + str(res) + '\n')
+    if res >= sim_threshold:
+        f.write(key + ': ' + str(res) + '\n')
 
 print('done.')
 

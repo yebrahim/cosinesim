@@ -1,4 +1,5 @@
 consinesim - a Cosine Similarity computation script for a collection of documents
+created by Yasser Ebrahim, 29OCT12
 ----
 
 This script takes a collection of documents that represent TF-IDF tokens from news articles (other measures can work too, provided they comply with the parsing format of this script). It also takes an additional file that describes votes for a number of users that we need to compute the cosine similarity between. It then computes the similarity in one of three modes:
