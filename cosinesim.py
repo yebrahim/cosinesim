@@ -6,7 +6,7 @@ File: cosinesim.py
 Author: Yasser Ebrahim
 Date: Oct 2012
 
-Calculate consine similarity between given users, represented as two vectors of liked items
+Calculate consine similarity between given users, represented as vectors of liked items
 Items are documents which should be given to the script, contained in a directory, and labeled by
     the IDs similar to the ones in the user vectors
 
