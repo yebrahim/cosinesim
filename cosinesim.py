@@ -121,7 +121,6 @@ for line in f:
 print('building user features..')
 for u in user_documents:
     build_features(u)
-    print('generated features for ' + str(u) + ': ' + str(user_features[u]))
 
 f = open(out_file, 'w')
 
